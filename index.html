@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Radio comunitaria con IA · El Colorado, Formosa</title>
+<meta name="description" content="Radio comunitaria de El Colorado, Formosa: la voz del locutor, la inteligencia artificial y los vecinos en un mismo espacio.">
+<meta name="theme-color" content="#070B1C">
+<link rel="icon" href="assets/logo-radio.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Unbounded:wght@500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+<div id="micBar" class="mic-bar" role="status" hidden>Micrófono en uso: se está grabando o el micrófono está encendido.</div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <img src="assets/logo-radio.jpg" alt="Logo de Radio comunitaria con IA: micrófono con auriculares y chip de IA, torre de transmisión y siluetas de vecinos">
+      <div class="names">
+        <h1>Radio comunitaria con IA</h1>
+        <span class="sub">El Colorado, Formosa · tu voz, la IA y los vecinos</span>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="srv off" id="serverBadge" role="status">Servidor de la radio: verificando…</span>
+    </div>
+  </header>
+
+  <p class="notice"><strong>Voces sintéticas.</strong> Sofía y Matías son voces generadas por computadora. Las noticias son un resumen con fecha y fuente al 11 de noviembre de 2026; verificalas antes de difundirlas. Tu voz y los mensajes de los vecinos son siempre humanos y solo salen al aire con aprobación de un locutor.</p>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones de la radio">
+    <button class="tab" role="tab" type="button" data-tab="live" aria-selected="true">En vivo</button>
+    <button class="tab" role="tab" type="button" data-tab="estudio" aria-selected="false">Mi estudio</button>
+    <button class="tab" role="tab" type="button" data-tab="biblioteca" aria-selected="false">Biblioteca</button>
+    <button class="tab" role="tab" type="button" data-tab="participa" aria-selected="false">Participá</button>
+    <button class="tab" role="tab" type="button" data-tab="locutores" aria-selected="false">Locutores</button>
+    <button class="tab" role="tab" type="button" data-tab="buzon" aria-selected="false">Buzón del vecino</button>
+    <button class="tab" role="tab" type="button" data-tab="quiz" aria-selected="false">¿Real o hecho con IA?</button>
+    <button class="tab" role="tab" type="button" data-tab="verif" aria-selected="false">Verificación</button>
+  </nav>
+
+  <main id="main" class="stack">
+
+  <!-- ===== EN VIVO ===== -->
+  <div id="tab-live" class="stack" role="tabpanel">
+    <div class="grid console3d">
+      <div class="col">
+        <section class="rx" aria-label="Receptor">
+          <div class="rx-head">
+            <span class="station">Radio comunitaria con IA</span>
+            <span class="lamp" id="lamp"><i></i><span id="lampTxt">Detenida</span></span>
+          </div>
+
+          <div class="dial" aria-hidden="true">
+            <div class="ticks"></div>
+            <div class="ticks major"></div>
+            <div class="nums"><span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span></div>
+            <div class="needle" id="needle" style="left:2%"></div>
+          </div>
+
+          <div class="now">
+            <p class="kind" id="nowKind">Listo para emitir</p>
+            <h2 id="nowTitle">Cortina de la radio</h2>
+          </div>
+
+          <div class="cap" aria-live="polite">
+            <p class="who" id="capWho">Sala de control</p>
+            <p class="txt" id="capTxt">Elegí la voz y tocá Reproducir para empezar la emisión.</p>
+            <p class="src" id="capSrc"></p>
+          </div>
+
+          <fieldset class="voicemode">
+            <legend>Quién habla en la emisión</legend>
+            <div class="seg" role="radiogroup">
+              <label><input type="radio" name="voiceMode" value="mia"><span>Mi voz</span></label>
+              <label><input type="radio" name="voiceMode" value="ia"><span>Voz IA</span></label>
+              <label><input type="radio" name="voiceMode" value="conv" checked><span>Conversación</span></label>
+            </div>
+            <p class="hint" id="modeNote"></p>
+          </fieldset>
+
+          <div class="ctrl">
+            <button class="btn primary" id="btnPlay" type="button">Reproducir</button>
+            <button class="btn" id="btnPause" type="button" disabled>Pausar</button>
+            <button class="btn" id="btnResume" type="button" disabled>Continuar</button>
+            <button class="btn" id="btnNext" type="button" disabled>Siguiente</button>
+            <button class="btn danger" id="btnStop" type="button" disabled>Detener</button>
+            <button class="btn hot" id="btnAsk" type="button" hidden>Preguntar en vivo</button>
+            <label class="vol" for="vol">Volumen
+              <input id="vol" type="range" min="0" max="100" value="80">
+            </label>
+          </div>
+          <p class="voices" id="voicesInfo"></p>
+          <p class="voices" id="askNote" hidden>La pregunta en vivo funciona cuando abrís el simulador dentro de Claude.</p>
+          <details class="el" id="elPanel" hidden>
+            <summary>Voces realistas de ElevenLabs para Sofía y Matías (opcional, acento rioplatense)</summary>
+            <div class="stack2">
+              <p class="hint">Opcional. Con tu clave de ElevenLabs, Sofía y Matías hablan con voces argentinas mucho más naturales. La clave se usa solo desde tu navegador para pedir el audio a ElevenLabs, que descuenta créditos de tu cuenta. No la compartas ni la dejes en un equipo ajeno. Para la radio real, la clave va en el servidor (ver README).</p>
+              <div class="field"><label for="elKey">Clave de API de ElevenLabs</label><input type="password" id="elKey" autocomplete="off" spellcheck="false" placeholder="Pegá tu clave (empieza con sk_)"></div>
+              <div class="row">
+                <div class="field"><label for="elVS">Voz de Sofía</label><select id="elVS"></select></div>
+                <button class="btn" id="elPreS" type="button">Escuchar muestra</button>
+              </div>
+              <div class="field"><label for="elCS">O el ID de tu propia voz para Sofía (opcional)</label><input type="text" id="elCS" class="el-x" autocomplete="off" spellcheck="false" placeholder="Ej: YLtqUTaEXb7a9MAYuJu4"></div>
+              <div class="row">
+                <div class="field"><label for="elVM">Voz de Matías</label><select id="elVM"></select></div>
+                <button class="btn" id="elPreM" type="button">Escuchar muestra</button>
+              </div>
+              <div class="field"><label for="elCM">O el ID de tu propia voz para Matías (opcional)</label><input type="text" id="elCM" class="el-x" autocomplete="off" spellcheck="false" placeholder="Pegá acá el ID de la voz nueva que generaste"></div>
+              <label class="chk"><input type="checkbox" id="elRem"> Recordar la clave en este dispositivo</label>
+              <div class="ctrl2">
+                <button class="btn primary" id="elOn" type="button">Activar y probar</button>
+                <button class="btn" id="elOff" type="button">Volver a las voces del navegador</button>
+                <button class="btn" id="elForget" type="button">Borrar clave</button>
+              </div>
+              <p class="status" id="elStatus" role="status"></p>
+            </div>
+          </details>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card" aria-label="Programación">
+          <h3>Programación de esta emisión</h3>
+          <ul class="q" id="queue"></ul>
+          <p class="hint">Cortina, presentación, tu voz, asistente IA, mensajes de oyentes aprobados, noticias, publicidades, respuestas y despedida. Las noticias que descartes en Verificación se saltean.</p>
+        </section>
+
+        <section class="card file" aria-label="Canciones">
+          <h3>Tus canciones de IA</h3>
+          <p class="hint">Cargá canciones creadas con IA (mp3, wav, m4a) y suenan entre los segmentos. Quedan en tu dispositivo, no se suben a ningún lado. Sin canciones, suenan cuatro temas tocados por instrumentos sintetizados, más una cortina de fondo bajo las voces.</p>
+          <input id="files" type="file" accept="audio/*" multiple>
+          <label class="pick" for="files">Cargar canciones</label>
+          <ul class="tracks" id="tracks"></ul>
+          <button class="mini" id="clearTracks" type="button" hidden>Quitar todas</button>
+        </section>
+      </div>
+    </div>
+
+    <section class="card" id="askPanel" aria-label="Pregunta en vivo" hidden>
+      <div class="ph">
+        <h2>Preguntá en vivo</h2>
+        <p>Escribí o dictá tu pregunta sobre inteligencia artificial. Sofía y Matías la responden con fundamentos y un breve análisis.</p>
+      </div>
+      <div class="field">
+        <label for="askQ">Tu pregunta</label>
+        <textarea id="askQ" maxlength="300" placeholder="Ej: ¿Puede la IA reemplazar a un locutor de radio?"></textarea>
+      </div>
+      <div class="opts" id="askChips"></div>
+      <div class="ctrl">
+        <button class="btn primary" id="askGo" type="button">Preguntar</button>
+        <button class="btn" id="askStop" type="button" hidden>Detener</button>
+        <button class="btn" id="askMic" type="button" hidden>Dictar</button>
+        <button class="btn" id="askBack" type="button">Volver a la emisión</button>
+      </div>
+      <p class="status" id="askStatus"></p>
+      <div id="askOut" class="stack" style="gap:14px" hidden>
+        <div class="cap" style="min-height:0" aria-live="polite">
+          <p class="who" id="askWho"></p>
+          <p class="txt" id="askTxt"></p>
+        </div>
+        <p class="lbl">Conversación</p>
+        <ol class="tr" id="askTr"></ol>
+        <p class="lbl">Fundamentos</p>
+        <ul class="tips" id="askFund"></ul>
+        <p class="lbl">Análisis</p>
+        <div class="analysis" id="askAna"></div>
+        <div><span class="pill" id="askCert"><i></i><span></span></span></div>
+        <p class="foot">Respuesta generada por IA, sin búsqueda en internet. Puede tener errores: verificá los datos antes de difundirlos.</p>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Fuentes">
+      <h3>Fuentes de las noticias</h3>
+      <ul class="srcs">
+        <li><a href="https://cafeconia.substack.com/p/cafe-con-ia-11-de-noviembre-de-2026" target="_blank" rel="noopener">Café con IA, 11 de noviembre de 2026</a></li>
+        <li><a href="https://aiweekly.co/ai-news-today/edition/2026-11-06" target="_blank" rel="noopener">AI Weekly, 6 de noviembre de 2026</a></li>
+        <li><a href="https://dplnews.com/argentina-inteligencia-artificial-desembarca-en-las-escuelas-primarias-de-caba-y-causa-polemica/" target="_blank" rel="noopener">DPL News, 4 de marzo de 2026</a></li>
+      </ul>
+      <p class="foot">Son boletines y medios de terceros: cada dato aparece como lo cuentan ellos. Antes de emitir en la radio real, confirmá la información en la fuente original.</p>
+    </section>
+  </div>
+
+  <!-- ===== MI ESTUDIO DE VOZ ===== -->
+  <div id="tab-estudio" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>Mi estudio de voz</h2>
+      <p>Grabá con tu micrófono, escuchá, descargá y guardá en la biblioteca. También podés subir un MP3, WAV o M4A. El audio queda en tu dispositivo: no se envía a ningún lado.</p>
+    </div>
+    <div class="grid even">
+      <div class="col">
+        <section class="card" aria-label="Grabadora"><div id="studioRec"></div></section>
+      </div>
+      <div class="col">
+        <section class="card" aria-label="Guardar o subir">
+          <h3>Guardar en la biblioteca</h3>
+          <div class="field"><label for="stTitle">Título</label><input type="text" id="stTitle" maxlength="120" placeholder="Ej: Saludo de la mañana"></div>
+          <div class="row2">
+            <div class="field"><label for="stCat">Categoría</label><select id="stCat"></select></div>
+            <div class="field"><label for="stVoice">Voz</label><select id="stVoice"><option value="mia">Mi voz</option><option value="ia">Voz IA</option></select></div>
+          </div>
+          <div class="ctrl">
+            <button class="btn primary" id="stSave" type="button" disabled>Guardar en la biblioteca</button>
+            <button class="btn" id="stDiscard" type="button">Descartar</button>
+          </div>
+          <hr class="sep">
+          <h3>Subir un audio</h3>
+          <div class="field"><label for="stFile">Archivo MP3, WAV o M4A (hasta 40 MB)</label><input type="file" id="stFile" accept="audio/*,.mp3,.wav,.m4a"></div>
+          <p class="status" id="stMsg" role="status"></p>
+          <p class="hint">Si el navegador pide permiso para usar el micrófono, tocá «Permitir». Mientras el micrófono está encendido aparece un aviso rojo arriba de la página.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BIBLIOTECA ===== -->
+  <div id="tab-biblioteca" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>Biblioteca de audios</h2>
+      <p>Tus grabaciones por categoría. Se guardan en este navegador (IndexedDB), no dependen de ninguna API y siguen ahí cuando cerrás la página.</p>
+    </div>
+    <section class="card" aria-label="Biblioteca">
+      <div class="chips" id="libChips" role="group" aria-label="Filtrar por categoría"></div>
+      <label class="vol" for="libVol" style="margin-left:0">Volumen de escucha <input id="libVol" type="range" min="0" max="100" value="90"></label>
+      <ul class="plain" id="libList"></ul>
+      <p class="hint" id="libEmpty" hidden></p>
+      <p class="status" id="libStorage"></p>
+      <p class="status" id="libMsg" role="status"></p>
+    </section>
+    <section class="card" aria-label="Importar audios">
+      <h3>Importar audios a la biblioteca</h3>
+      <div class="row2">
+        <div class="field"><label for="libImportCat">Categoría</label><select id="libImportCat"></select></div>
+        <div class="field"><label for="libImportVoice">Voz</label><select id="libImportVoice"><option value="mia">Mi voz</option><option value="ia">Voz IA</option></select></div>
+      </div>
+      <div class="field"><label for="libImport">Archivos MP3, WAV o M4A</label><input type="file" id="libImport" accept="audio/*,.mp3,.wav,.m4a" multiple></div>
+    </section>
+  </div>
+
+  <!-- ===== PARTICIPÁ ===== -->
+  <div id="tab-participa" class="stack" role="tabpanel" hidden>
+    <section class="hero" aria-label="Participación comunitaria">
+      <h2>TU VOZ EN NUESTRA RADIO – PARTICIPÁ CON NOSOTROS</h2>
+      <p>Mandanos tu pregunta, tu inquietud o tu opinión sobre El Colorado. Grabá tu voz o escribila y la generamos con voz artificial. Un locutor la escucha y decide si sale al aire: nada se transmite solo.</p>
+      <div class="bigbtns">
+        <button class="big a" id="btnSendAudio" type="button" aria-expanded="false" aria-controls="panelSend">ENVIAR MI AUDIO</button>
+        <button class="big b" id="btnGenAudio" type="button" aria-expanded="false" aria-controls="panelGen">GENERAR AUDIOS</button>
+      </div>
+      <p class="status" id="cmServer" role="status"></p>
+    </section>
+
+    <section class="card panel-open" id="panelSend" aria-label="Enviar mi audio" hidden>
+      <h3>Enviar mi audio</h3>
+      <div id="cmRec"></div>
+      <div class="row2">
+        <div class="field"><label for="cmCat">¿Sobre qué es?</label><select id="cmCat"></select></div>
+        <div class="field"><label for="cmName">Tu nombre (opcional)</label><input type="text" id="cmName" maxlength="60" autocomplete="given-name" placeholder="Ej: Rosa"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="cmAnon"><span>Prefiero enviarlo de forma anónima</span></label>
+      <div class="field"><label for="cmNote">Nota escrita (opcional)</label><textarea id="cmNote" maxlength="600" placeholder="Si querés, resumí tu mensaje en texto."></textarea></div>
+      <label class="check"><input type="checkbox" id="cmConsentStore"><span>Acepto que los locutores reciban y guarden mi audio para escucharlo y responderme. Puedo pedir que lo borren cuando quiera. <strong>(obligatorio)</strong></span></label>
+      <label class="check"><input type="checkbox" id="cmConsentAir"><span>Autorizo que, si un locutor lo aprueba, mi mensaje se difunda por la radio. Si no lo marco, solo lo escuchan los locutores.</span></label>
+      <div class="ctrl"><button class="btn primary" id="cmSend" type="button" disabled>Enviar a la radio</button></div>
+      <p class="status" id="cmMsg" role="status"></p>
+    </section>
+
+    <section class="card panel-open" id="panelGen" aria-label="Generar audios" hidden>
+      <h3>Generar audios con voz artificial argentina</h3>
+      <p class="status" id="gnStatus" role="status"></p>
+      <div class="field"><label for="gnText">Escribí tu pregunta o mensaje</label><textarea id="gnText" maxlength="600" placeholder="Ej: Quisiera saber cuándo se arregla la ruta de acceso al barrio."></textarea><span class="clip-meta" id="gnCount">0 / 600</span></div>
+      <div class="row2">
+        <div class="field"><label for="gnCat">Categoría</label><select id="gnCat"></select></div>
+        <div class="field"><label for="gnName">Tu nombre (opcional)</label><input type="text" id="gnName" maxlength="60" placeholder="Ej: Rosa"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="gnAnon"><span>Prefiero enviarlo de forma anónima</span></label>
+      <div class="ctrl"><button class="btn primary" id="gnGen" type="button">Generar audio</button></div>
+      <div id="gnResult" class="panel-open" hidden>
+        <div class="ctrl"><button class="btn" id="gnPlay" type="button">▶ Escuchar</button></div>
+      </div>
+      <label class="check"><input type="checkbox" id="gnConsentStore"><span>Acepto que los locutores reciban y guarden mi mensaje. Puedo pedir que lo borren. <strong>(obligatorio para enviar)</strong></span></label>
+      <label class="check"><input type="checkbox" id="gnConsentAir"><span>Autorizo que, si un locutor lo aprueba, se difunda por la radio.</span></label>
+      <div class="ctrl">
+        <button class="btn primary" id="gnSend" type="button">Enviar el audio a la radio</button>
+        <button class="btn" id="gnSendText" type="button">Enviar solo el texto</button>
+      </div>
+      <p class="status" id="gnMsg" role="status"></p>
+    </section>
+
+    <section class="card" id="cmSentBox" aria-label="Mis mensajes enviados" hidden>
+      <h3>Mis mensajes enviados</h3>
+      <p class="hint">Desde acá podés borrar un mensaje tuyo del servidor cuando quieras.</p>
+      <ul class="plain" id="cmSent"></ul>
+      <p class="status" id="cmDelMsg" role="status"></p>
+    </section>
+    <section class="card" id="cmOutboxBox" aria-label="Mensajes sin enviar" hidden>
+      <h3>Mensajes sin enviar</h3>
+      <p class="hint">No llegaron al servidor. Están guardados solo en este dispositivo.</p>
+      <ul class="plain" id="cmOutbox"></ul>
+      <p class="status" id="cmOutMsg" role="status"></p>
+    </section>
+  </div>
+
+  <!-- ===== LOCUTORES ===== -->
+  <div id="tab-locutores" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>Bandeja privada de locutores</h2>
+      <p>Acá llegan los mensajes de los vecinos. Solo entran locutores con usuario y contraseña del servidor.</p>
+    </div>
+    <section class="card" id="lcLoginBox" aria-label="Ingreso de locutores">
+      <form id="lcLogin" class="panel-open" autocomplete="on">
+        <div class="row2">
+          <div class="field"><label for="lcUser">Usuario</label><input type="text" id="lcUser" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+          <div class="field"><label for="lcPass">Contraseña</label><input type="password" id="lcPass" autocomplete="current-password"></div>
+        </div>
+        <div class="ctrl"><button class="btn primary" id="lcEnter" type="submit">Ingresar</button></div>
+        <p class="status" id="lcLoginMsg" role="status"></p>
+      </form>
+    </section>
+    <div id="lcApp" class="stack" hidden>
+      <div class="ctrl"><span class="srv ok" id="lcWho"></span><button class="btn" id="lcRefresh" type="button">Actualizar</button><button class="btn" id="lcLogout" type="button">Cerrar sesión</button></div>
+      <div class="split">
+        <section class="card" aria-label="Mensajes recibidos">
+          <div class="filters">
+            <div class="field"><label for="lcStatus">Estado</label><select id="lcStatus"><option value="">Todos</option><option value="nuevo">Nuevos</option><option value="aprobado">Aprobados</option><option value="rechazado">Rechazados</option></select></div>
+            <div class="field"><label for="lcCat">Categoría</label><select id="lcCat"></select></div>
+            <div class="field"><label for="lcAnswered">Respuesta</label><select id="lcAnswered"><option value="">Todos</option><option value="false">Sin responder</option><option value="true">Respondidos</option></select></div>
+            <div class="field"><label for="lcQ">Buscar</label><input type="search" id="lcQ" placeholder="Texto o nombre"></div>
+          </div>
+          <p class="status" id="lcCount"></p>
+          <ul class="plain" id="lcList"></ul>
+          <p class="hint" id="lcEmpty" hidden>No hay mensajes con estos filtros.</p>
+          <p class="status" id="lcListMsg" role="status"></p>
+        </section>
+        <section class="card" aria-label="Detalle del mensaje"><div id="lcDetail"><p class="hint">Elegí un mensaje de la lista para escucharlo, leerlo, aprobarlo o responderlo.</p></div></section>
+      </div>
+      <section class="card" id="voicePanel" aria-label="Voces"></section>
+    </div>
+  </div>
+
+  <!-- ===== BUZÓN DEL VECINO ===== -->
+  <div id="tab-buzon" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>Buzón del vecino</h2>
+      <p>Así se convierte un mensaje de WhatsApp en un aviso de radio: la máquina propone un borrador y una persona confirma cada dato antes de que salga al aire.</p>
+    </div>
+    <ol class="steps" id="bzSteps" aria-label="Pasos del aviso">
+      <li data-s="1"><b>1</b>Mensaje</li>
+      <li data-s="2"><b>2</b>Borrador</li>
+      <li data-s="3"><b>3</b>Revisión humana</li>
+      <li data-s="4"><b>4</b>Al aire</li>
+    </ol>
+    <div class="grid even">
+      <div class="col">
+        <section class="card" aria-label="Mensaje y borrador">
+          <div class="field">
+            <label for="bzMsg">Mensaje del vecino (ejemplo, podés cambiarlo)</label>
+            <textarea id="bzMsg"></textarea>
+          </div>
+          <div class="ctrl">
+            <button class="btn primary" id="bzDraft" type="button">Armar borrador</button>
+            <button class="btn" id="bzReset" type="button">Volver al ejemplo</button>
+          </div>
+          <p class="hint">El borrador lo arma un programa simple que busca fecha, hora, lugar y teléfono en el texto. En la radio real lo haría un asistente de IA y la revisión humana sería la misma.</p>
+          <div id="bzFields" hidden>
+            <div class="stack" style="gap:12px">
+              <div class="field" id="fQue"><label for="bzQue">Qué es</label><input type="text" id="bzQue"><span class="warn" hidden>Falta completar este dato.</span></div>
+              <div class="field" id="fCuando"><label for="bzCuando">Cuándo</label><input type="text" id="bzCuando"><span class="warn" hidden>Falta completar este dato.</span></div>
+              <div class="field" id="fDonde"><label for="bzDonde">Dónde</label><input type="text" id="bzDonde"><span class="warn" hidden>Falta completar este dato.</span></div>
+              <div class="field" id="fContacto"><label for="bzContacto">Contacto</label><input type="text" id="bzContacto"><span class="warn" hidden>Falta completar este dato.</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="col">
+        <section class="card" aria-label="Revisión y aire">
+          <h3>Revisión humana</h3>
+          <p class="hint">Nada sale al aire sin estas cuatro confirmaciones.</p>
+          <div>
+            <label class="chk"><input type="checkbox" class="bzChk"><span>Confirmé la fecha y la hora con el vecino</span></label>
+            <label class="chk"><input type="checkbox" class="bzChk"><span>Confirmé el lugar</span></label>
+            <label class="chk"><input type="checkbox" class="bzChk"><span>Confirmé el contacto</span></label>
+            <label class="chk"><input type="checkbox" class="bzChk"><span>El vecino me autorizó a difundir su mensaje</span></label>
+          </div>
+          <p class="lbl">Así sonaría el aviso</p>
+          <div class="preview" id="bzPreview">Armá el borrador para ver el aviso.</div>
+          <div class="ctrl">
+            <button class="btn primary" id="bzAir" type="button" disabled>Leer al aire</button>
+          </div>
+          <p class="status" id="bzStatus">Completá el borrador y las cuatro confirmaciones para habilitar la lectura.</p>
+          <div class="cap" id="bzCapBox" hidden aria-live="polite" style="min-height:0">
+            <p class="who" id="bzCapWho"></p>
+            <p class="txt" id="bzCapTxt"></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ¿REAL O HECHO CON IA? ===== -->
+  <div id="tab-quiz" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>¿Real o hecho con IA?</h2>
+      <p>Ocho situaciones de todos los días. Decidí si el mensaje es confiable o sospechoso (posible estafa o contenido falso hecho con IA) y mirá por qué.</p>
+    </div>
+    <div class="grid even">
+      <div class="col">
+        <section class="card" aria-label="Juego">
+          <div id="qPlay">
+            <div class="stack" style="gap:14px">
+              <p class="lbl" id="qMeta"></p>
+              <div class="progress" aria-hidden="true"><i id="qBar" style="width:0%"></i></div>
+              <p class="lbl" id="qKind"></p>
+              <div class="scenario" id="qText"></div>
+              <div class="opts">
+                <button class="btn" id="qOk" type="button">Confiable</button>
+                <button class="btn" id="qBad" type="button">Sospechoso</button>
+                <button class="btn" id="qListen" type="button">Escuchar mensaje</button>
+              </div>
+              <div class="fb" id="qFb" hidden aria-live="polite">
+                <strong id="qFbTitle"></strong>
+                <p id="qFbText"></p>
+              </div>
+              <div class="ctrl"><button class="btn primary" id="qNext" type="button" hidden>Siguiente</button></div>
+            </div>
+          </div>
+          <div id="qEnd" class="stack" style="gap:14px" hidden>
+            <p class="lbl">Tu resultado</p>
+            <p class="score" id="qScore"></p>
+            <p id="qVerdict"></p>
+            <div class="ctrl"><button class="btn primary" id="qAgain" type="button">Jugar de nuevo</button></div>
+          </div>
+        </section>
+      </div>
+      <div class="col">
+        <section class="card" aria-label="Consejos">
+          <h3>Para recordar</h3>
+          <ul class="tips">
+            <li>La urgencia y el pedido de plata son la señal más fuerte de estafa.</li>
+            <li>Una voz o un video pueden estar imitados con IA: confirmá llamando al número de siempre.</li>
+            <li>Los bancos no piden claves ni códigos por mensaje.</li>
+            <li>Un premio que te hace pagar primero no es un premio.</li>
+            <li>Sin fuente, fecha y autor, una foto o un dato no se difunde.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VERIFICACIÓN ===== -->
+  <div id="tab-verif" class="stack" role="tabpanel" hidden>
+    <div class="ph">
+      <h2>Tablero de verificación</h2>
+      <p>Cada noticia pasa por cuatro controles antes de salir al aire. Si falta la fuente o la fecha, o si la descartás, no se emite: la emisión en vivo la saltea.</p>
+    </div>
+    <div class="summary">
+      <span class="score" id="vCount"></span>
+      <span class="status" id="vNote">Las noticias del simulador empiezan en amarillo: tienen fuente y fecha, pero falta contrastarlas con la fuente original.</span>
+    </div>
+    <div class="grid even" id="vList"></div>
+  </div>
+
+  </main>
+
+  <footer class="site-foot">
+    <span><strong>Radio comunitaria con IA · El Colorado, Formosa.</strong> El WhatsApp y el enlace de transmisión se cargan en <code>config.js</code> y aparecen acá cuando los completes.</span>
+    <span>Privacidad: el micrófono solo se usa cuando lo activás y se ve un aviso rojo mientras está encendido. Tus grabaciones quedan en tu dispositivo hasta que decidas enviarlas.</span>
+  </footer>
+</div>
+
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="contenido.js"></script>
+<script src="radio-engine.js"></script>
+<script src="api.js"></script>
+<script src="audio-recorder.js"></script>
+<script src="audio-library.js"></script>
+<script src="voice-generator.js"></script>
+<script src="radio-player.js"></script>
+<script src="community.js"></script>
+<script src="inbox.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
